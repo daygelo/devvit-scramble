@@ -1,97 +1,102 @@
+import { Devvit, useChannel, useState } from '@devvit/public-api';
 import './createPost.js';
-
-import { Devvit, useState, useWebView } from '@devvit/public-api';
-
-import type { DevvitMessage, WebViewMessage } from './message.js';
 
 Devvit.configure({
   redditAPI: true,
   redis: true,
+  realtime: true,
 });
 
-// Add a custom post type to Devvit
 Devvit.addCustomPostType({
-  name: 'Web View Example',
+  name: 'Unscramble!',
   height: 'tall',
   render: (context) => {
-    // Load username with `useAsync` hook
-    const [username] = useState(async () => {
-      return (await context.reddit.getCurrentUsername()) ?? 'anon';
+    const [image] = useState<string>(async () => await context.redis.get(`${context.postId}_image`));
+    const [answer] = useState<string>(async () => await context.redis.get(`${context.postId}_answer`));
+    const [state, setState] = useState<number[]>(async () => {
+      const fetchedData = await context.redis.get(`${context.postId}_state`);
+      if (fetchedData) return JSON.parse(fetchedData);
+
+      const initialData = Array.apply(null, Array(64)).map((_, i) => i);
+      for (let i = initialData.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [initialData[i], initialData[j]] = [initialData[j], initialData[i]];
+      }
+
+      await context.redis.set(`${context.postId}_state`, JSON.stringify(initialData));
+
+      return initialData;
     });
 
-    // Load latest counter from redis with `useAsync` hook
-    const [counter, setCounter] = useState(async () => {
-      const redisCount = await context.redis.get(`counter_${context.postId}`);
-      return Number(redisCount ?? 0);
-    });
+    const onMessage = async (message) => {
+      switch (message.type) {
+        case 'ready':
+          context.ui.webView.postMessage({ type: 'update', data: { state, image, answer } });
+          break;
 
-    const webView = useWebView<WebViewMessage, DevvitMessage>({
-      // URL of your web view content
-      url: 'page.html',
+        case 'correct':
+          context.ui.showToast('Congrats! You got it!');
+          break;
 
-      // Handle messages sent from the web view
-      async onMessage(message, webView) {
-        switch (message.type) {
-          case 'webViewReady':
-            webView.postMessage({
-              type: 'initialData',
-              data: {
-                username: username,
-                currentCounter: counter,
-              },
-            });
-            break;
-          case 'setCounter':
-            await context.redis.set(
-              `counter_${context.postId}`,
-              message.data.newCounter.toString()
-            );
-            setCounter(message.data.newCounter);
+        case 'wrong':
+          context.ui.showToast('Nope! That’s not it, try again!');
+          break;
 
-            webView.postMessage({
-              type: 'updateCounter',
-              data: {
-                currentCounter: message.data.newCounter,
-              },
-            });
-            break;
-          default:
-            throw new Error(`Unknown message type: ${message satisfies never}`);
-        }
+        case 'create':
+          const subreddit = await context.reddit.getCurrentSubreddit();
+          const post = await context.reddit.submitPost({
+            subredditName: subreddit.name,
+            title: 'What is this? Unscramble!',
+            preview: (
+              <vstack width="100%" height="100%" alignment="middle center" backgroundColor="#642f1e">
+                <text size="xxlarge" color="white" weight="bold">Loading Unscramble!...</text>
+              </vstack>
+            ),
+          });
+
+          await context.redis.set(`${post.id}_image`, message.data.image);
+          await context.redis.set(`${post.id}_answer`, message.data.answer);
+          context.ui.showToast({ text: 'Successfully created your post!' });
+          context.ui.navigateTo(post);
+          break;
+
+        case 'swap':
+          const newState = state;
+
+          [
+            newState[message.data[0]],
+            newState[message.data[1]],
+          ] = [
+            newState[message.data[1]],
+            newState[message.data[0]],
+          ];
+
+          setState(newState);
+          await context.redis.set(`${context.postId}_state`, JSON.stringify(newState));
+          await channel.send(newState);
+          break;
+
+        default:
+          throw new Error(`Unknown message type: ${message satisfies never}`);
+      }
+    }
+
+    const channel = useChannel({
+      name: `${context.postId}`,
+      onMessage: (newState) => {
+        setState(newState);
+        context.ui.webView.postMessage({ type: 'update', data: { state: newState } });
       },
-      onUnmount() {
-        context.ui.showToast('Web view closed!');
-      },
     });
+    channel.subscribe();
 
-    // Render the custom post type
     return (
-      <vstack grow padding="small">
-        <vstack grow alignment="middle center">
-          <text size="xlarge" weight="bold">
-            Example App
-          </text>
-          <spacer />
-          <vstack alignment="start middle">
-            <hstack>
-              <text size="medium">Username:</text>
-              <text size="medium" weight="bold">
-                {' '}
-                {username ?? ''}
-              </text>
-            </hstack>
-            <hstack>
-              <text size="medium">Current counter:</text>
-              <text size="medium" weight="bold">
-                {' '}
-                {counter ?? ''}
-              </text>
-            </hstack>
-          </vstack>
-          <spacer />
-          <button onPress={() => webView.mount()}>Launch App</button>
+      <zstack width='100%' height='100%'>
+        <vstack width='100%' height='100%' alignment='middle center' backgroundColor='#642f1e'>
+          <text size='xxlarge' color='white' weight='bold'>Loading Unscramble!...</text>
         </vstack>
-      </vstack>
+        <webview url='page.html' onMessage={onMessage} width='100%' height='100%'/>
+      </zstack>
     );
   },
 });

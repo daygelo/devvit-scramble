@@ -1,114 +1,189 @@
-:root {
-  --primary-color: #6b7280;
-  --background-color: #f3f4f6;
-  --text-color: #374151;
-  --accent-color: #60a5fa;
-  --border-radius: 6px;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+body {
+  margin: 0;
+
+  /* thanks to https://www.magicpattern.design/tools/css-backgrounds */
+  --color-1: #723d25;
+  --color-2: #642f1e;
+  --color-3: #562314;
+  background-color: var(--color-3);
+  background-image:  linear-gradient(30deg, var(--color-1) 12%, transparent 12.5%, transparent 87%, var(--color-1) 87.5%, var(--color-1)), linear-gradient(150deg, var(--color-1) 12%, transparent 12.5%, transparent 87%, var(--color-1) 87.5%, var(--color-1)), linear-gradient(30deg, var(--color-1) 12%, transparent 12.5%, transparent 87%, var(--color-1) 87.5%, var(--color-1)), linear-gradient(150deg, var(--color-1) 12%, transparent 12.5%, transparent 87%, var(--color-1) 87.5%, var(--color-1)), linear-gradient(60deg, var(--color-2) 25%, transparent 25.5%, transparent 75%, var(--color-2) 75%, var(--color-2)), linear-gradient(60deg, var(--color-2) 25%, transparent 25.5%, transparent 75%, var(--color-2) 75%, var(--color-2));
+  background-size: 40px 70px;
+  background-position: 0 0, 0 0, 20px 36px, 20px 36px, 0 0, 20px 36px;
 }
 
-body {
+section {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  max-width: 650px;
-  margin: 0 auto;
-  min-height: 100vh;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.3;
-  position: fixed;
-  width: 100%;
-  height: 100%;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding-top: 16px;
+  width: 100vw;
+  height: calc(100vh - 16px);
 }
 
-h1,
-h2,
-h3 {
-  margin: 0;
-  color: var(--primary-color);
+.hidden {
+  display: none;
+}
+
+button, input, #game main, #create-canvas {
+  background: #421a0f;
+  border: 4px inset #dca049;
+  box-shadow: 0 0 0 2px #000, 4px 4px 4px #0002;
+}
+
+body > button {
+  position: absolute;
+  top: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: white;
+  font: bold 1.5rem sans-serif;
+  text-shadow: 2px 2px #000;
+  transition: 0.1s ease-in-out;
+}
+
+body > button:hover {
+  border-color: #f3daa7;
+}
+
+body > button:first-of-type {
+  left: 8px;
+}
+
+body > button:last-of-type {
+  right: 8px;
 }
 
 h1 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-h2 {
-  font-size: 1.3rem;
-  font-weight: 600;
-}
-
-h3 {
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-
-#username,
-#counter {
-  color: var(--accent-color);
-  font-weight: 600;
-}
-
-/* New button container */
-.button-container {
-  display: flex;
-  gap: 0.5rem;
-  width: 100%;
-}
-
-button {
-  flex: 1;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: var(--border-radius);
-  background-color: var(--accent-color);
+  margin: 0;
   color: white;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-  box-shadow: var(--shadow);
+  font: bold 1.5rem sans-serif;
+  text-shadow: 2px 2px #000;
+}
+
+#info p {
+  width: 80%;
+  padding: 12px 8px;
+  background: #0008;
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  color: white;
+  font: bold 1rem/1.5 sans-serif;
+  text-shadow: 2px 2px #000;
+  text-align: center;
+}
+
+#answer {
   margin: 0;
+  color: #a3e635;
+  font: bold 2rem sans-serif;
+  text-shadow: 2px 2px #000;
 }
 
-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+input {
+  width: 240px;
+  height: 48px;
+  padding: 0 12px;
+  color: white;
+  font: bold 1.5rem sans-serif;
+  text-align: center;
+  text-shadow: 2px 2px #000;
+  transition: 0.1s ease-in-out;
 }
 
-button:active {
-  transform: translateY(0);
+input::placeholder {
+  color: #dca049;
+  opacity: 1;
 }
 
-#btn-decrease {
-  background-color: var(--primary-color);
+input:hover, input:focus {
+  border-color: #f3daa7;
 }
 
-pre {
-  background-color: white;
-  padding: 0.75rem;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
-  overflow-x: auto;
-  font-family: 'Courier New', Courier, monospace;
-  border: 1px solid #e5e7eb;
-  font-size: 0.9rem;
-  margin: 0;
+#game main {
+  display: grid;
+  grid-template-columns: repeat(8, auto);
+  grid-template-rows: repeat(8, auto);
+  align-self: center;
+  margin: 16px 0;
 }
 
-@media (max-width: 640px) {
-  body {
-    padding: 0.75rem;
-    gap: 0.5rem;
-  }
+.cell {
+  width: min(10vw, 8vh);
+  height: min(10vw, 8vh);
+  transition: transform 0.1s cubic-bezier(0, 0, .58, 2);
+}
 
-  h1 {
-    font-size: 1.5rem;
-  }
+.cell:hover, .selected {
+  border-radius: 2px;
+  box-shadow: 0 0 0 2px #000, 0 0 0 3px #fff, 0 1px 6px 2px #0002;
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+.cell:hover {
+  z-index: 20;
+}
+
+.cell:active {
+  transform: scale(1)
+}
+
+#create-canvas {
+  width: min(60vw, 55vh);
+  height: min(60vw, 55vh);
+  background: #fff;
+}
+
+#create main {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+  gap: 16px;
+}
+
+#create aside {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 250px;
+}
+
+#create aside button {
+  border-radius: 8px;
+  border: 2px solid #fff1;
+}
+
+#create aside button.size {
+  width: 28px;
+  height: 28px;
+  background: #421a0f;
+  color: white;
+  font: bold 0.75rem sans-serif;
+}
+
+#create aside button.color {
+  width: 20px;
+  height: 20px;
+}
+
+#create aside button.selected {
+  border: 2px solid #fff;
+}
+
+#create-button {
+  width: 100px;
+  height: 48px;
+  padding: 0 12px;
+  color: white;
+  font: bold 1.5rem sans-serif;
+  text-shadow: 2px 2px #000;
+  transition: 0.1s ease-in-out;
+}
+
+#create-button:hover {
+  border-color: #f3daa7;
 }

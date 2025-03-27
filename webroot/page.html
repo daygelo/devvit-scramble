@@ -6,19 +6,61 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <meta charset="UTF-8" />
-    <title>Web View Example</title>
+    <title>Unscramble!</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>This is your page.html</h1>
-    <h3>Your username is <span id="username">Guest</span></h3>
-    <h3>Current counter is at: <span id="counter">0</span></h3>
-    <div class="button-container">
-      <button id="btn-increase">Increase Counter ⬆️</button>
-      <button id="btn-decrease">Decrease Counter ⬇️</button>
-    </div>
-    <h3>Last message from Devvit blocks:</h3>
-    <pre id="messageOutput"></pre>
+    <button id='create-page-button'>+</button>
+    <button id='info-button'>?</button>
+    <section id='game'>
+      <h1>Unscramble the prompt!</h1>
+      <main></main>
+      <input id='guess-input' type='text' placeholder='Take a guess!'/>
+      <p id='answer' class='hidden'></p>
+    </section>
+    <section id='info'>
+      <h1>Welcome to Unscramble!</h1>
+      <p>
+        Your goal is to successfully answer the prompt, but the prompt is a scrambled image! Collaborate with your fellow Redditors in realtime to unscramble the image in order to properly guess the answer.
+      </p>
+    </section>
+    <section id='create'>
+      <h1>Create your own prompt drawing!</h1>
+      <main>
+        <aside>
+          <button class='size' data-size='4'>XS</button>
+          <button class='size' data-size='10'>S</button>
+          <button class='size selected' data-size='15'>M</button>
+          <button class='size' data-size='30'>L</button>
+          <button class='size' data-size='60'>XL</button>
+        </aside>
+        <canvas id='create-canvas' width='512' height='512'></canvas>
+        <aside>
+          <button class='color' data-color='#dc2626'></button>
+          <button class='color' data-color='#f97316'></button>
+          <button class='color' data-color='#facc15'></button>
+          <button class='color' data-color='#a3e635'></button>
+          <button class='color' data-color='#009911'></button>
+          <button class='color' data-color='#06b6d4'></button>
+          <button class='color' data-color='#2563eb'></button>
+          <button class='color' data-color='#1e40af'></button>
+          <button class='color' data-color='#a855f7'></button>
+          <button class='color' data-color='#ec4899'></button>
+          <button class='color' data-color='#ffa983'></button>
+          <button class='color' data-color='#bf6a4a'></button>
+          <button class='color' data-color='#652a17'></button>
+          <button class='color' data-color='#ffffff'></button>
+          <button class='color' data-color='#9ca3af'></button>
+          <button class='color' data-color='#6b7280'></button>
+          <button class='color' data-color='#374151'></button>
+          <button class='color selected' data-color='#000000'></button>
+        </aside>
+      </main>
+      <div>
+        <input id='create-input' type='text' placeholder='What’s the answer?'/>
+        <button id='create-button'>Post!</button>
+      </div>
+    </section>
     <script type="application/javascript" src="script.js"></script>
   </body>
 </html>
